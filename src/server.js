@@ -3,9 +3,10 @@ const fs = require("fs");
 const path = require("path");
 
 const server = http.createServer((req, res) => {
-  let filePath = "." + req.url;
-  if (filePath === "./") {
-    filePath = "./public/index.html";
+  const base = process.env.PUBLIC_PATH || "";
+  let filePath = base + req.url;
+  if (req.url === "/") {
+    filePath = base + "/index.html";
   }
 
   const contentType = getContentType(filePath);
