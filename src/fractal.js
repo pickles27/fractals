@@ -1,31 +1,26 @@
+const z = {};
+const zSquared = {};
 const MAX_ITERATION = 80;
-const REAL_SET = { start: -2, end: 1 }; // represented by x-axis
-const IMAGINARY_SET = { start: -1, end: 1 }; // represented by y-axis
-
 /**
  * Calculates whether point c in complex plane is member of mandelbrot set (M)
  * Returns tuple containing rate of divergence and boolean representing if c is in M
  * f_c(Z) = Z^2 + c
  */
-function mandelbrot(c) {
+function mandelbrot(real, imaginary) {
   // Start iterating from 0
-  let z = { x: 0, y: 0 };
   let iterationCount = 0;
-  let zSquared;
   let modulus;
+  z.x = 0;
+  z.y = 0;
 
   do {
     // Calculate and store square of Z
-    zSquared = {
-      x: Math.pow(z.x, 2) - Math.pow(z.y, 2),
-      y: 2 * z.x * z.y,
-    };
+    zSquared.x = Math.pow(z.x, 2) - Math.pow(z.y, 2);
+    zSquared.y = 2 * z.x * z.y;
 
     // Update Z by adding c
-    z = {
-      x: zSquared.x + c.x,
-      y: zSquared.y + c.y,
-    };
+    z.x = zSquared.x + real;
+    z.y = zSquared.y + imaginary;
 
     // Calculate modulus: |z| = √(x2 + y2)
     modulus = Math.sqrt(Math.pow(z.x, 2) + Math.pow(z.y, 2));
@@ -54,7 +49,16 @@ function generateRandomHexColor() {
 
 const colors = Array(MAX_ITERATION)
   .fill(0)
-  .map((_, index) => generateRandomHexColor());
+  .map(() => generateRandomHexColor());
+
+const REAL_SET = { start: -2, end: 1 }; // represented by x-axis
+const IMAGINARY_SET = { start: -1, end: 1 }; // represented by y-axis
+
+const mutableRealSet = { start: REAL_SET.start, end: REAL_SET.end };
+const mutableImaginarySet = {
+  start: IMAGINARY_SET.start,
+  end: IMAGINARY_SET.end,
+};
 
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
@@ -64,23 +68,34 @@ ctx.canvas.width = WIDTH;
 ctx.canvas.height = HEIGHT;
 draw();
 
+const SCALE_FACTOR = 0.75;
+document.body.addEventListener("click", () => {
+  // reduce size of real/imaginary sets by 25%
+  mutableRealSet.start = SCALE_FACTOR * mutableRealSet.start;
+  mutableRealSet.end = SCALE_FACTOR * mutableRealSet.end;
+  mutableImaginarySet.start = SCALE_FACTOR * mutableImaginarySet.start;
+  mutableImaginarySet.end = SCALE_FACTOR * mutableImaginarySet.end;
+
+  draw();
+});
+
 function draw() {
   // Iterate over entire canvas
   for (let i = 0; i < WIDTH; i++) {
     for (let j = 0; j < HEIGHT; j++) {
       // Map point to complex number
-      const complexNum = {
-        // Map x to position in real number range { start: -2, end: 1 }
-        // i / WIDTH = (x - start) / (end - start) => x = i * (end - start) / WIDTH
-        x: REAL_SET.start + (i * (REAL_SET.end - REAL_SET.start)) / WIDTH,
-        // Map y to position in imaginary number range { start: -1, end: 1 }
-        // j / HEIGHT = (y - start) / (end - start) => y = j * (end - start) / HEIGHT
-        y:
-          IMAGINARY_SET.start +
-          (j * (IMAGINARY_SET.end - IMAGINARY_SET.start)) / HEIGHT,
-      };
+      // Map x to position in real number range { start: -2, end: 1 }
+      // i / WIDTH = (x - start) / (end - start) => x = i * (end - start) / WIDTH
+      const real =
+        mutableRealSet.start +
+        (i * (mutableRealSet.end - mutableRealSet.start)) / WIDTH;
+      // Map y to position in imaginary number range { start: -1, end: 1 }
+      // j / HEIGHT = (y - start) / (end - start) => y = j * (end - start) / HEIGHT
+      const imaginary =
+        mutableImaginarySet.start +
+        (j * (mutableImaginarySet.end - mutableImaginarySet.start)) / HEIGHT;
 
-      const [divergence, isWithinSet] = mandelbrot(complexNum);
+      const [divergence, isWithinSet] = mandelbrot(real, imaginary);
       const pointColor = isWithinSet ? "#000" : colors[divergence];
 
       ctx.fillStyle = pointColor;
