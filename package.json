@@ -2,9 +2,9 @@
   "name": "fractals",
   "version": "1.0.0",
   "description": "just some fractals",
-  "main": "src/index.js",
+  "main": "src/server.js",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node src/server.js"
   },
   "author": "Sarah Pickrahn"
 }
