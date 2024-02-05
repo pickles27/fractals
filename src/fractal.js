@@ -1,8 +1,3 @@
-const WIDTH = window.innerWidth;
-const HEIGHT = window.innerHeight;
-
-const HEX_CHARS = "0123456789abcdef";
-
 const MAX_ITERATION = 80;
 
 const z = {};
@@ -27,8 +22,8 @@ const mutableImaginarySet = {
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 
-ctx.canvas.width = WIDTH;
-ctx.canvas.height = HEIGHT;
+ctx.canvas.width = window.innerWidth;
+ctx.canvas.height = window.innerHeight;
 
 document.body.addEventListener("click", handleClick);
 
