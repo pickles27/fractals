@@ -115,14 +115,30 @@ function setPixel(imageData, x, y, r, g, b) {
   imageData.data[index + 3] = ALPHA_CHANNEL; // Alpha channel
 }
 
-const SCALE_FACTOR = 0.75;
+const SCALE_FACTOR = 0.5;
 /** Scales down the real and imaginary sets and redraws canvas */
-function handleClick() {
-  // reduce size of real/imaginary sets by 25%
-  mutableRealSet.start = SCALE_FACTOR * mutableRealSet.start;
-  mutableRealSet.end = SCALE_FACTOR * mutableRealSet.end;
-  mutableImaginarySet.start = SCALE_FACTOR * mutableImaginarySet.start;
-  mutableImaginarySet.end = SCALE_FACTOR * mutableImaginarySet.end;
+function handleClick(e) {
+  // handle x coordinate
+  const proportionAcrossWindowX = e.pageX / window.innerWidth;
+  const realSetWidth = mutableRealSet.end - mutableRealSet.start;
+  const newRealSetWidth = realSetWidth * SCALE_FACTOR;
+  const newRealSetCenter =
+    mutableRealSet.start + realSetWidth * proportionAcrossWindowX;
+  const newRealSetStart = newRealSetCenter - newRealSetWidth / 2;
+  const newRealSetEnd = newRealSetCenter + newRealSetWidth / 2;
+  mutableRealSet.start = newRealSetStart;
+  mutableRealSet.end = newRealSetEnd;
+
+  // handle y coordinate
+  const proportionAcrossWindowY = e.pageY / window.innerHeight;
+  const imaginarySetWidth = mutableImaginarySet.end - mutableImaginarySet.start;
+  const newImaginarySetWidth = imaginarySetWidth * SCALE_FACTOR;
+  const newImaginarySetCenter =
+    mutableImaginarySet.start + imaginarySetWidth * proportionAcrossWindowY;
+  const newImaginarySetStart = newImaginarySetCenter - newImaginarySetWidth / 2;
+  const newImaginarySetEnd = newImaginarySetCenter + newImaginarySetWidth / 2;
+  mutableImaginarySet.start = newImaginarySetStart;
+  mutableImaginarySet.end = newImaginarySetEnd;
 
   draw();
 }
