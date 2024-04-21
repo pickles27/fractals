@@ -1,3 +1,5 @@
 # fractals
 
-just messing around with fractals and the canvas api
+uses the canvas api to render the mandelbrot set.
+
+`npm run start`
