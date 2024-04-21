@@ -127,7 +127,7 @@ const IMAGINARY_SET = { start: -1, end: 1 };
 const z = {};
 
 /**
- * The current point in c being considered.
+ * The current point in c being considered, squared.
  */
 const zSquared = {};
 
@@ -225,13 +225,13 @@ function mandelbrot(real, imaginary) {
 }
 
 /**
- *
+ * Assigns the provided RGB color to the given pixel.
  * @param {*} imageData - The canvas context's image data.
- * @param {number} x -
- * @param {number} y
- * @param {number} r
- * @param {number} g
- * @param {number} b
+ * @param {number} x - Position along horizontal axis.
+ * @param {number} y - Position along vertical axis.
+ * @param {number} r - red portion of RGB color.
+ * @param {number} g - green portion of RGB color.
+ * @param {number} b - blue portion of RGB color.
  */
 function setPixel(imageData, x, y, r, g, b) {
   // Calculate the index in the flat buffer
@@ -244,7 +244,7 @@ function setPixel(imageData, x, y, r, g, b) {
   imageData.data[index + 3] = ALPHA_CHANNEL; // Alpha channel
 }
 
-/** Scales down the real and imaginary sets and redraws canvas */
+/** Scales down the real and imaginary sets being considered and redraws canvas. */
 function handleClick(e) {
   // handle x coordinate
   const proportionAcrossWindowX = e.pageX / window.innerWidth;
