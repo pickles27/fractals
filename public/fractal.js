@@ -1,27 +1,155 @@
+/**
+ * This code calculates whether each pixel (representing a point in the complex plane c)
+ * within the window is included in the Mandelbrot set (M). The points within M are colored black,
+ * and the points outside M are mapped to a rainbow color based on the rate of divergence.
+ * The horizontal axis represents the real portion of the complex number, and the vertical represents the imaginary.
+ */
+
+/**
+ * The maximum number of times the modulus is calculated and checked if less than 2 for each point c in the complex plane.
+ */
 const MAX_ITERATION = 80;
 
-const z = {};
-const zSquared = {};
-
+/**
+ * Alpha channel of every color in the list. Fully opaque.
+ */
 const ALPHA_CHANNEL = 255;
+
+/**
+ * The color assigned to the points representing members of M.
+ */
 const MEMBER_COLOR = [0, 0, 0];
 
-const colors = Array(MAX_ITERATION)
-  .fill(0)
-  .map(() => generateRandomColor());
+/**
+ * A list of colors in rainbow order.
+ */
+const COLORS = [
+  [139, 0, 0],
+  [166, 29, 0],
+  [192, 57, 43],
+  [217, 84, 45],
+  [242, 121, 41],
+  [245, 160, 0],
+  [255, 185, 15],
+  [255, 209, 26],
+  [255, 223, 34],
+  [255, 240, 0],
+  [230, 230, 0],
+  [200, 200, 0],
+  [173, 255, 47],
+  [154, 205, 50],
+  [124, 252, 0],
+  [50, 205, 50],
+  [34, 139, 34],
+  [0, 128, 0],
+  [0, 100, 0],
+  [0, 255, 255],
+  [0, 206, 209],
+  [64, 224, 208],
+  [0, 255, 127],
+  [0, 250, 154],
+  [46, 139, 87],
+  [0, 128, 128],
+  [0, 255, 0],
+  [34, 139, 34],
+  [60, 179, 113],
+  [152, 251, 152],
+  [144, 238, 144],
+  [152, 255, 152],
+  [0, 255, 0],
+  [127, 255, 0],
+  [124, 252, 0],
+  [50, 205, 50],
+  [173, 255, 47],
+  [154, 205, 50],
+  [173, 216, 230],
+  [0, 191, 255],
+  [135, 206, 235],
+  [30, 144, 255],
+  [0, 0, 255],
+  [65, 105, 225],
+  [0, 0, 139],
+  [0, 0, 128],
+  [25, 25, 112],
+  [0, 0, 205],
+  [0, 0, 255],
+  [30, 144, 255],
+  [65, 105, 225],
+  [0, 0, 139],
+  [128, 0, 128],
+  [75, 0, 130],
+  [139, 0, 139],
+  [148, 0, 211],
+  [186, 85, 211],
+  [139, 0, 139],
+  [238, 130, 238],
+  [255, 0, 255],
+  [255, 20, 147],
+  [255, 105, 180],
+  [255, 182, 193],
+  [255, 192, 203],
+  [255, 240, 245],
+  [255, 255, 255],
+  [245, 245, 245],
+  [220, 220, 220],
+  [211, 211, 211],
+  [192, 192, 192],
+  [169, 169, 169],
+  [128, 128, 128],
+  [105, 105, 105],
+  [255, 69, 0],
+  [128, 0, 128],
+  [75, 0, 130],
+  [139, 0, 139],
+  [148, 0, 211],
+  [186, 85, 211],
+  [139, 0, 139],
+];
 
-const REAL_SET = { start: -2, end: 1 }; // represented by x-axis
-const IMAGINARY_SET = { start: -1, end: 1 }; // represented by y-axis
+/**
+ * The factor by which the x and y axis are multiplied when zooming in.
+ */
+const SCALE_FACTOR = 0.5;
 
+/**
+ * Represented by x-axis. The start and end of the maximum range that we consider.
+ */
+const REAL_SET = { start: -2, end: 1 };
+
+/**
+ * Represented by y-axis. The start and end of the maximum range that we consider.
+ */
+const IMAGINARY_SET = { start: -1, end: 1 };
+
+/**
+ * The current point in c being considered.
+ */
+const z = {};
+
+/**
+ * The current point in c being considered.
+ */
+const zSquared = {};
+
+/**
+ * The current start and end of the real number range we are considering.
+ */
 const mutableRealSet = { start: REAL_SET.start, end: REAL_SET.end };
+
+/**
+ * The current start and end of the imaginary number range we are considering.
+ */
 const mutableImaginarySet = {
   start: IMAGINARY_SET.start,
   end: IMAGINARY_SET.end,
 };
 
 var canvas = document.getElementById("canvas");
-var ctx = canvas.getContext("2d");
 
+/**
+ * The canvas element. Width and height are set to full inner width and height of window.
+ */
+const ctx = canvas.getContext("2d");
 ctx.canvas.width = window.innerWidth;
 ctx.canvas.height = window.innerHeight;
 
@@ -30,7 +158,7 @@ document.body.addEventListener("click", handleClick);
 draw();
 
 /**
- * Calculates divergence of all pixels and paints canvas
+ * Calculates divergence of all pixels and paints canvas.
  */
 function draw() {
   const imageData = ctx.createImageData(canvas.width, canvas.height);
@@ -51,7 +179,7 @@ function draw() {
           canvas.height;
 
       const [divergence, isWithinSet] = mandelbrot(real, imaginary);
-      const [r, g, b] = isWithinSet ? MEMBER_COLOR : colors[divergence - 1];
+      const [r, g, b] = isWithinSet ? MEMBER_COLOR : COLORS[divergence - 1];
       setPixel(imageData, i, j, r, g, b, ALPHA_CHANNEL);
     }
   }
@@ -96,14 +224,15 @@ function mandelbrot(real, imaginary) {
   return [iterationCount, modulus <= 2];
 }
 
-function generateRandomColor() {
-  const r = Math.round(255 * Math.random());
-  const g = Math.round(255 * Math.random());
-  const b = Math.round(255 * Math.random());
-
-  return [r, g, b];
-}
-
+/**
+ *
+ * @param {*} imageData - The canvas context's image data.
+ * @param {number} x -
+ * @param {number} y
+ * @param {number} r
+ * @param {number} g
+ * @param {number} b
+ */
 function setPixel(imageData, x, y, r, g, b) {
   // Calculate the index in the flat buffer
   const index = (y * imageData.width + x) * 4;
@@ -115,7 +244,6 @@ function setPixel(imageData, x, y, r, g, b) {
   imageData.data[index + 3] = ALPHA_CHANNEL; // Alpha channel
 }
 
-const SCALE_FACTOR = 0.5;
 /** Scales down the real and imaginary sets and redraws canvas */
 function handleClick(e) {
   // handle x coordinate
