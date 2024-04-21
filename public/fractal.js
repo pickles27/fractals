@@ -147,11 +147,11 @@ const mutableImaginarySet = {
 var canvas = document.getElementById("canvas");
 
 /**
- * The canvas element. Width and height are set to full inner width and height of window.
+ * The canvas element. Width and height are set based on a 3:2 image dimension, based on width.
  */
 const ctx = canvas.getContext("2d");
 ctx.canvas.width = window.innerWidth;
-ctx.canvas.height = window.innerHeight;
+ctx.canvas.height = (window.innerWidth * 2) / 3;
 
 document.body.addEventListener("click", handleClick);
 
@@ -247,7 +247,7 @@ function setPixel(imageData, x, y, r, g, b) {
 /** Scales down the real and imaginary sets being considered and redraws canvas. */
 function handleClick(e) {
   // handle x coordinate
-  const proportionAcrossWindowX = e.pageX / window.innerWidth;
+  const proportionAcrossWindowX = e.pageX / canvas.width;
   const realSetWidth = mutableRealSet.end - mutableRealSet.start;
   const newRealSetWidth = realSetWidth * SCALE_FACTOR;
   const newRealSetCenter =
@@ -258,7 +258,7 @@ function handleClick(e) {
   mutableRealSet.end = newRealSetEnd;
 
   // handle y coordinate
-  const proportionAcrossWindowY = e.pageY / window.innerHeight;
+  const proportionAcrossWindowY = e.pageY / canvas.height;
   const imaginarySetWidth = mutableImaginarySet.end - mutableImaginarySet.start;
   const newImaginarySetWidth = imaginarySetWidth * SCALE_FACTOR;
   const newImaginarySetCenter =
