@@ -272,6 +272,7 @@ function handleZoomByClick(e) {
   draw();
 }
 
+/** Resets the zoom so that the entire mandelbrot set is visible. */
 function handleZoomResetByRightClick(e) {
   e.preventDefault();
 
