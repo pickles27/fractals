@@ -21,7 +21,7 @@ const ALPHA_CHANNEL = 255;
 const MEMBER_COLOR = [0, 0, 0];
 
 /**
- * A list of colors in rainbow order.
+ * A list of colors in rainbow-ish order.
  */
 const COLORS = [
   [139, 0, 0],
