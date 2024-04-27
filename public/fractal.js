@@ -144,16 +144,19 @@ const mutableImaginarySet = {
   end: IMAGINARY_SET.end,
 };
 
-var canvas = document.getElementById("canvas");
-
 /**
  * The canvas element. Width and height are set based on a 3:2 image dimension, based on width.
  */
+var canvas = document.getElementById("canvas");
+
+/** The canvas context. */
 const ctx = canvas.getContext("2d");
+
 ctx.canvas.width = window.innerWidth;
 ctx.canvas.height = (window.innerWidth * 2) / 3;
 
-document.body.addEventListener("click", handleClick);
+document.body.addEventListener("click", handleZoomByClick);
+document.body.addEventListener("contextmenu", handleZoomResetByRightClick);
 
 draw();
 
@@ -245,8 +248,7 @@ function setPixel(imageData, x, y, r, g, b) {
 }
 
 /** Scales down the real and imaginary sets being considered and redraws canvas. */
-function handleClick(e) {
-  // handle x coordinate
+function handleZoomByClick(e) {
   const proportionAcrossWindowX = e.pageX / canvas.width;
   const realSetWidth = mutableRealSet.end - mutableRealSet.start;
   const newRealSetWidth = realSetWidth * SCALE_FACTOR;
@@ -257,7 +259,6 @@ function handleClick(e) {
   mutableRealSet.start = newRealSetStart;
   mutableRealSet.end = newRealSetEnd;
 
-  // handle y coordinate
   const proportionAcrossWindowY = e.pageY / canvas.height;
   const imaginarySetWidth = mutableImaginarySet.end - mutableImaginarySet.start;
   const newImaginarySetWidth = imaginarySetWidth * SCALE_FACTOR;
@@ -269,4 +270,17 @@ function handleClick(e) {
   mutableImaginarySet.end = newImaginarySetEnd;
 
   draw();
+}
+
+function handleZoomResetByRightClick(e) {
+  e.preventDefault();
+
+  mutableRealSet.start = REAL_SET.start;
+  mutableRealSet.end = REAL_SET.end;
+  mutableImaginarySet.start = IMAGINARY_SET.start;
+  mutableImaginarySet.end = IMAGINARY_SET.end;
+
+  draw();
+
+  return false; // Prevents context menu from appearing
 }
